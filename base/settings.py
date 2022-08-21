@@ -10,20 +10,31 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-from pathlib import Path 
+from pathlib import Path
+import environ
+import os 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# django-environ
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, True)
+)
 
+# The base directory for our project
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Take environment variable from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-msp2og+%cf7bp6po^5ok3s5zzux($c6jo-$2s0n$n@&wc*3&k7'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# False if not in os.environ because of casting above
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -75,8 +86,13 @@ WSGI_APPLICATION = 'base.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASS'),
+        'HOST': env('DB_URI'),
+        'PORT': env('DB_PORT'),
+
     }
 }
 
