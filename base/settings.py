@@ -38,10 +38,33 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
+#USER MODELS
+AUTH_USER_MODEL = 'user_auth.MyUser'
+
+#DJANGO-CORS-HEADERS CONFIG
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_METHODS = [
+    "GET",
+    "OPTIONS",
+    "POST",
+]
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+
 
 # Application definition
-
 INSTALLED_APPS = [
+    "corsheaders",#django-cors-headers
     'user_auth',#User Authentication App
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,6 +75,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",#django-cors-headers
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
