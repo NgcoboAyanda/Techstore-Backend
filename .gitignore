@@ -2,3 +2,4 @@
 db.sqlite3
 auth/migrations
 base/__pycache__
+user_auth/__pycache__
