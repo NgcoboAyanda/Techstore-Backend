@@ -7,6 +7,8 @@ class UserTests(APITransactionTestCase):
     """
         Tests the user view.
     """
+    def setUp(self):
+        dave = MyUser(email='dave@gmai.com', first_name='Dave', last_name='Smith', password='IamDave99', date_of_birth='1942-01-01')
 
     def test_create_account(self):
         """
@@ -23,4 +25,4 @@ class UserTests(APITransactionTestCase):
         response = self.client.post(url, data, format='json')
         print(response)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(MyUser.objects.count(), 2)
+        self.assertEqual(MyUser.objects.count(), 1)
