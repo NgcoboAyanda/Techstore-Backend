@@ -1,17 +1,16 @@
 from django.shortcuts import render
 from django.db.utils import IntegrityError
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.exceptions import APIException
 
+#Models
 from user_auth.models import MyUser
 
-# 409 Exception
-class EmailAlreadyExists(APIException):
-    status_code = 409
-    default_detail = 'Error! A user with that email address already exists.'
-    default_code = 'Email Already Exists.'
+#Exceptions
+from user_auth.exceptions import EmailAlreadyExists, InvalidDateOfBirth
+
 
 # Create your views here.
 class SignupView(APIView):
@@ -26,18 +25,22 @@ class SignupView(APIView):
         first_name = data['first_name']
         last_name = data['last_name']
         dob = data['date_of_birth']
+        password = data['password']
         
         try:
             #creating the new user
-            MyUser.objects.create(email=email, first_name=first_name, last_name=last_name, date_of_birth=dob)
+            MyUser.objects.create(email=email, first_name=first_name, last_name=last_name, date_of_birth=dob, password=password)
             return {'Message':'User successfully registered. You can now log in.'}
         
-        except(IntegrityError):
+        #except(IntegrityError):
         #An integrity error will be raised if the email address is associated with another account.
-            raise EmailAlreadyExists
+        #    raise EmailAlreadyExists
 
+        except(ValidationError):
+        #This means the date was captured wrong
+            raise InvalidDateOfBirth
 
     def post(self, request):
         resp = self.createUser(request_object=request)
-        return Response(resp)
+        return Response(resp, status=201)
 
