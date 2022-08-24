@@ -16,7 +16,7 @@ class UserTests(APITransactionTestCase):
         """
         url = reverse('signup')
         data = {
-            "email": 'supzeFire22@gmail.com',
+            "email": '',
             "first_name": 'Supa',
             "last_name": 'Faya',
             "date_of_birth": '1988-02-09',
