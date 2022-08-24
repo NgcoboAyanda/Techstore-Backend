@@ -1,0 +1,40 @@
+[
+    {
+        "model": "user_auth.myuser",
+        "pk": 1,
+        "fields": {
+            "password": "suckmydick99",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "supaFaya@sdf.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-08-24T09:34:49.793Z",
+            "email": "supaFaya@sdf.com",
+            "first_name": "Supa",
+            "last_name": "Faya",
+            "date_of_birth": "2004-02-11",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "user_auth.myuser",
+        "pk": 2,
+        "fields": {
+            "password": "duckmysick66",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "gorilla99@mail.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2022-08-24T09:34:49.793Z",
+            "email": "gorilla99@mail.com",
+            "first_name": "Gorilla",
+            "last_name": "Staff",
+            "date_of_birth": "1992-07-12",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+    ]

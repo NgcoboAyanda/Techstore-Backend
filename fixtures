@@ -1,0 +1,21 @@
+[
+{
+    "model": "user_auth.myuser",
+    "pk": 10,
+    "fields": {
+        "password": "suckmydick99",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2022-08-24T09:34:49.793Z",
+        "email": "ayanda13@protonmail.com",
+        "first_name": "Ayanda",
+        "last_name": "Ngcobo",
+        "date_of_birth": "2001-08-13",
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]
