@@ -12,13 +12,10 @@ from user_auth.models import MyUser
 #Exceptions
 from user_auth.exceptions import EmailAlreadyExists, InvalidDateOfBirth, InvalidEmail, InvalidInformation, PasswordTooShort
 
-
-# Create your views here.
-class SignupView(APIView):
+#BASE VIEW
+class BaseView(APIView):
     """
-    A simple View for signing up.
-    *Only takes POST request*
-    *Returns status code 200 on success*
+        This is the base view that every view will inherit. It contains methods that may be used across different views.
     """
     def validate(self, type, phrase):
         """
@@ -36,7 +33,7 @@ class SignupView(APIView):
 
             if(re.fullmatch(email_regex, phrase)):
                 #if the email is valid we return it
-                return string
+                return phrase
 
             else:
                 raise InvalidEmail
@@ -58,7 +55,22 @@ class SignupView(APIView):
                 raise PasswordTooShort()
 
 
+# Signup View
+class SignupView(BaseView):
+    """
+        A simple View for signing up.
+        *Only takes POST request*
+        *Returns status code 200 on success*
+    """
+
     def createUser(self, request_object):
+        """
+            A function that signs the user up.
+            *Takes one argument:
+                request_object -- [this is the request object]
+            *If there are no errors then the user is created and a response with HTTP_STATUS_CODE-201-CREATED is returned.
+            *If there are errors then they are handled.
+        """
         data = request_object.data
         #EVERY VALUE IS VALIDATED BY self.validate() function
         email = self.validate(type='email-field', phrase=data['email'] )

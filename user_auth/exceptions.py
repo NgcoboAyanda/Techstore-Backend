@@ -7,7 +7,7 @@ class ValidationError(APIException):
 # EMAIL EXCEPTIONS
 class EmailAlreadyExists(APIException):
     status_code = 409
-    default_detail = 'Error! A user with that email address already exists.'
+    default_detail = 'A user with that email address already exists.'
     default_code = 'Email Already Exists.'
 
 class InvalidEmail(ValidationError):
