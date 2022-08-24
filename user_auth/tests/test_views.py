@@ -8,7 +8,7 @@ class UserTests(APITransactionTestCase):
     """
         Tests the user view.
     """
-    fixtures = ["testdata.json"] #Adds 2 users to db
+    fixtures = ["user_auth.json"] #Adds 2 users to db
 
     def test_create_account(self):
         """

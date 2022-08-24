@@ -8,6 +8,7 @@ class MyUser(AbstractUser):
     first_name = models.CharField(max_length=40)
     last_name = models.CharField(max_length=60)
     date_of_birth = models.DateField()
+    username = None
     REQUIRED_FIELDS = ['first_name', 'last_name'] # making all fields compulsory
 
     def __str__(self):

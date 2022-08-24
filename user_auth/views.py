@@ -32,9 +32,9 @@ class SignupView(APIView):
             MyUser.objects.create(email=email, first_name=first_name, last_name=last_name, date_of_birth=dob, password=password)
             return {'Message':'User successfully registered. You can now log in.'}
         
-        #except(IntegrityError):
+        except(IntegrityError):
         #An integrity error will be raised if the email address is associated with another account.
-        #    raise EmailAlreadyExists
+            raise EmailAlreadyExists
 
         except(ValidationError):
         #This means the date was captured wrong
