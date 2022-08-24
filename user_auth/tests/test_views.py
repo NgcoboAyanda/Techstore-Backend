@@ -7,8 +7,6 @@ class UserTests(APITransactionTestCase):
     """
         Tests the user view.
     """
-    def setUp(self):
-        dave = MyUser(email='dave@gmai.com', first_name='Dave', last_name='Smith', password='IamDave99', date_of_birth='1942-01-01')
 
     def test_create_account(self):
         """

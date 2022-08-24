@@ -5,3 +5,4 @@ base/__pycache__/
 user_auth/__pycache__/
 user_auth/tests/__pycache__/
 user_auth/tests/__pycache__/test_views.cpython-39.pyc
+user_auth/tests/__pycache__/test_views.cpython-39.pyc
