@@ -45,16 +45,19 @@ class BaseView(APIView):
             
             else:
                 raise InvalidInformation
+                return None
             
         elif type == 'password-field':
             #Password has to be more than 6 characters
             chars = len(phrase)
-            if (chars > 1 and chars >= 6 ):
+            if chars >= 6 :
                 return phrase
-            elif (chars >= 0 and chars <= 1):
-                return InvalidPassword()
+            elif chars <=1:
+                raise InvalidPassword
+                return None
             else:
-                raise PasswordTooShort()
+                raise PasswordTooShort
+                raise None
 
 
 # Signup View
