@@ -19,12 +19,12 @@ class BaseView(APIView):
     """
     def validate(self, type, phrase):
         """
-            Function that validates the data.
+            Function that validates the form data.
             *Takes two arguments:
-                1) type -- [either 'email-field' or 'text-field' or 'password-field']
+                1) type -- ['email-field' or 'text-field' or 'password-field']
                 2) phrase -- [the string that is to be validated]
-            *If the string is valid then it will be returned
-            *If the string is invalid then an error will be thrown
+            *If the form data is valid then it will be returned
+            *If the form data is invalid then an error will be thrown
         """
 
         if type == 'email-field':
