@@ -18,7 +18,7 @@ class InvalidEmail(ValidationError):
 
 # DATE-OF-BIRTH EXCEPTIONS
 class InvalidDateOfBirth(ValidationError):
-    default_detail = 'Invalid Date Of Birth!'
+    default_detail = 'Invalid date of birth!'
     default_code = 'Invalid dob.'
 
 
