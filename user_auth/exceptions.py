@@ -28,6 +28,10 @@ class PasswordTooShort(ValidationError):
     default_detail = 'Password has less than 6 characters. Password is too short!'
     default_code = 'Short Password.'
 
+class InvalidPassword(ValidationError):
+    default_detail = 'Enter a valid password.'
+    default_code = 'Invalid Password.'
+
 
 # OTHER EXCEPTIONS
 class InvalidInformation(ValidationError):

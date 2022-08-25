@@ -54,7 +54,20 @@ class UserSignupTests(APITransactionTestCase):
         self.assertEqual(str(error_object), 'Password has less than 6 characters. Password is too short!')
 
     def test_invalid_information(self):
-        pass
+        """
+        Ensure that the correct response (error) is sent back when a user tries to signup but leaves some required fields empty. (i.e first_name, last_name and password)
+        """
+        data = {
+            "email": 'goodemai@tool.com',
+            "first_name": 'Doba',
+            "last_name": '',
+            "date_of_birth": '1990-02-02',
+            "password": 'realskreetnigga!'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+        error_object = response.data['detail']
+        self.assertEqual(str(error_object), 'A user with that email address already exists.')
 
     def test_email_already_exists(self):
         """

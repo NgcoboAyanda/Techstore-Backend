@@ -10,7 +10,7 @@ import re
 from user_auth.models import MyUser
 
 #Exceptions
-from user_auth.exceptions import EmailAlreadyExists, InvalidDateOfBirth, InvalidEmail, InvalidInformation, PasswordTooShort
+from user_auth.exceptions import EmailAlreadyExists, InvalidDateOfBirth, InvalidEmail, InvalidInformation, PasswordTooShort, InvalidPassword
 
 #BASE VIEW
 class BaseView(APIView):
@@ -48,9 +48,11 @@ class BaseView(APIView):
             
         elif type == 'password-field':
             #Password has to be more than 6 characters
-            if( len(phrase) >= 6 ):
+            chars = len(phrase)
+            if (chars > 1 and chars >= 6 ):
                 return phrase
-            
+            elif (chars >= 0 and chars <= 1):
+                return InvalidPassword()
             else:
                 raise PasswordTooShort()
 
