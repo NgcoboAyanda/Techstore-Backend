@@ -30,6 +30,7 @@ class UserSignupTests(APITransactionTestCase):
         error_object = response.data['detail']
         self.assertEqual(str(error_object), 'Invalid date of birth!')
 
+
     def test_password_too_short(self):
         """
         Ensure that the correct response (error) is sent back when a user attempts to use a password that is too short. (i.e less than 6 characters)
@@ -53,10 +54,36 @@ class UserSignupTests(APITransactionTestCase):
         error_object = response.data['detail']
         self.assertEqual(str(error_object), 'Password has less than 6 characters. Password is too short!')
 
+
+    def test_invalid_password(self):
+        """
+        Ensure that the correct response (error) is sent back when a user attempts to use an invalid password. (i.e password that has 0 or 1 character.)
+        """
+        url = reverse('signup')
+        data = {
+            "email": 'realNigg@msickmail.com',
+            "first_name": 'Bulford',
+            "last_name": 'OGE',
+            "date_of_birth": '1995-03-18',
+            "password": ''
+        }
+        #Checking that the password we pass in for this test is really less than 6 characters.
+        self.assertLessEqual(
+            len(data['password']), 
+            1, 
+            msg = f'Error! data["password"] has {len(data["password"])} characters. In order for this test to run, the data["password"] value should be between 0-1 characters..'
+        )
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        error_object = response.data['detail']
+        self.assertEqual(str(error_object), 'Enter a valid password.')
+
+
     def test_invalid_information(self):
         """
         Ensure that the correct response (error) is sent back when a user tries to signup but leaves some required fields empty. (i.e first_name, last_name and password)
         """
+        url = reverse('signup')
         data = {
             "email": 'goodemai@tool.com',
             "first_name": 'Doba',
@@ -65,9 +92,10 @@ class UserSignupTests(APITransactionTestCase):
             "password": 'realskreetnigga!'
         }
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         error_object = response.data['detail']
-        self.assertEqual(str(error_object), 'A user with that email address already exists.')
+        self.assertEqual(str(error_object), 'Required fields have not been submitted!')
+
 
     def test_email_already_exists(self):
         """
