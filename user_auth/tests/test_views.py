@@ -2,29 +2,35 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APITransactionTestCase
 from user_auth.models import MyUser
+from user_auth.factories import UserFactory
+from user_auth.serializers import UserSerializer
 
 
 class UserSignupTests(APITransactionTestCase):
     """
         Tests the user signup view.
     """
-    fixtures = ["user_auth.json"] #Adds 2 users to db
+    #fixtures = ["user_auth.json"] #Adds 2 users to db
+
+    def setUp(self):
+        """
+        Add users to the db before the test is run.
+        """
+        UserFactory.create_batch(3)
+    
 
     def test_invalid_dob(self):
         """
         Ensure the correct error if returned when an invalid date of birth is submitted.
         """
         url = reverse('signup')
-        data = {
-            "email": 'ilikepie@suck.co.za',
-            "first_name": 'Jack',
-            "last_name": 'Reacher',
-            #the correct format is YYYY-MM-DD
-            #the date below uses yyyy-dd-mm which is wrong
-            #this should make our server return status_code 422
-            "date_of_birth": '1952-22-11',
-            "password": 'ilikeartnigga11'
-        }
+        #data contains the user form
+        user = UserFactory.build()
+        data = UserSerializer(user).data
+        #adding password to user object
+        data['password'] = 'normalpassword'
+        #adding invalid dob
+        data['date_of_birth'] = '10-99-20'
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         error_object = response.data['detail']
@@ -36,13 +42,11 @@ class UserSignupTests(APITransactionTestCase):
         Ensure that the correct response (error) is sent back when a user attempts to use a password that is too short. (i.e less than 6 characters)
         """
         url = reverse('signup')
-        data = {
-            "email": 'realNigg@msickmail.com',
-            "first_name": 'Bulford',
-            "last_name": 'OGE',
-            "date_of_birth": '1995-03-18',
-            "password": 'qwera'
-        }
+        #data contains the user form data
+        user = UserFactory.build()
+        data = UserSerializer(user).data
+        #adding password to user object
+        data['password'] = '123'
         #Checking that the password we pass in for this test is really less than 6 characters.
         self.assertLess(
             len(data['password']), 
@@ -60,14 +64,12 @@ class UserSignupTests(APITransactionTestCase):
         Ensure that the correct response (error) is sent back when a user attempts to use an invalid password. (i.e password that has 0 or 1 character.)
         """
         url = reverse('signup')
-        data = {
-            "email": 'realNigg@msickmail.com',
-            "first_name": 'Bulford',
-            "last_name": 'OGE',
-            "date_of_birth": '1995-03-18',
-            "password": ''
-        }
-        #Checking that the password we pass in for this test is really less than 6 characters.
+        #data contains the user form data
+        user = UserFactory.build()
+        data = UserSerializer(user).data
+        #adding password to user object
+        data['password'] = ''
+        #Checking that the password we pass in for this test is really invalid.
         self.assertLessEqual(
             len(data['password']), 
             1, 
@@ -84,13 +86,13 @@ class UserSignupTests(APITransactionTestCase):
         Ensure that the correct response (error) is sent back when a user tries to signup but leaves some required fields empty. (i.e first_name, last_name and password)
         """
         url = reverse('signup')
-        data = {
-            "email": 'goodemai@tool.com',
-            "first_name": 'Doba',
-            "last_name": '',
-            "date_of_birth": '1990-02-02',
-            "password": 'realskreetnigga!'
-        }
+        #data contains the user form data
+        user = UserFactory.build()
+        data = UserSerializer(user).data
+        #adding password to user object
+        data['password'] = 'normalpassword'
+        #making sure that the first_name field is empty
+        data['first_name'] = ''
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         error_object = response.data['detail']
@@ -102,24 +104,15 @@ class UserSignupTests(APITransactionTestCase):
         Ensure that the correct response (error) is sent back when a user tries to signup with an email address that is already registered.
         """
         url = reverse('signup')
-        #the email of the user that already exists on the db
-        email = 'gorilla99@mail.com'
-        #ensure the user really exists on the db before proceeding
-        try:
-            user = MyUser.objects.get(email=email)
-        except MyUser.DoesNotExist:
-            user = None
-        self.assertTrue(
-            user
-            ,
-            msg = f'Error! User associated with the email "{email}" was not found. Please ensure that the fixtures file is loaded correctly and that a user with the email {email} exists on the fixtures file. In order for this test to run successfully, you have to use an email that is already registered with another user in the db.')
-        data = {
-            "email": 'gorilla99@mail.com',
-            "first_name": 'Stan',
-            "last_name": 'Propenko',
-            "date_of_birth": '1966-09-22',
-            "password": 'ilikeartnigga11'
-        }
+        #get the email of the user that already exists on the db
+        user_that_already_exists = MyUser.objects.all().last()
+        email = user_that_already_exists.email
+        #data contains the user form data
+        user = UserFactory.build()
+        data = UserSerializer(user).data
+        #adding password to user object
+        data['password'] = 'normalpassword'
+        data['email'] = email
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         error_object = response.data['detail']
@@ -159,4 +152,3 @@ class UserSignupTests(APITransactionTestCase):
     
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(MyUser.objects.count(), 3)
