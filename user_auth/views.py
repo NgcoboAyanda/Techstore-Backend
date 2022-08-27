@@ -1,16 +1,19 @@
 from django.shortcuts import render
+from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 import re
 
 #Models
 from user_auth.models import MyUser
+from user_auth.serializers import UserSerializer
 
 #Exceptions
-from user_auth.exceptions import EmailAlreadyExists, InvalidDateOfBirth, InvalidEmail, InvalidInformation, PasswordTooShort, InvalidPassword
+from user_auth.exceptions import EmailAlreadyExists, InvalidDateOfBirth, InvalidEmail, InvalidInformation, PasswordTooShort, InvalidPassword, UserNotFound
 
 #BASE VIEW
 class BaseView(APIView):
@@ -65,7 +68,7 @@ class SignupView(BaseView):
     """
         A simple View for signing up.
         *Only takes POST request*
-        *Returns status code 200 on success*
+        *Returns status code 201 HTTP CREATED on success*
     """
 
     def createUser(self, request_object):
@@ -87,8 +90,10 @@ class SignupView(BaseView):
 
         try:
             #creating the new user
-            MyUser.objects.create(email=email, first_name=first_name, last_name=last_name, date_of_birth=dob, password=password)
-            return {'Message':'User successfully registered. You can now log in.'}
+            new_user = MyUser(email=email, first_name=first_name, last_name=last_name, date_of_birth=dob, password='')
+            new_user.set_password(password)
+            new_user.save()
+            return {'message':'User successfully registered. You can now log in.'}
         
         except(IntegrityError):
         #An integrity error will be raised if the email address is associated with another account.
@@ -102,3 +107,28 @@ class SignupView(BaseView):
         resp = self.createUser(request_object=request)
         return Response(resp, status=201)
 
+
+#Login View
+class LoginView(BaseView):
+    """
+    A simple view for logging in.
+    *Only takes POST request
+    *Returns user object if user is succesfully authenticated. 
+    """
+    def post(self, request):
+        form_data = request.data
+        user_email = form_data['email']
+        user_password = form_data['password']
+        user_auth = authenticate(email=user_email, password=user_password)
+        if user_auth is not None:
+            #if authentication was successful
+            serializer = UserSerializer(user)
+            user = serializer.data
+            return Response(user)
+        else:
+            #if authentication failed
+            try:
+                the_user = MyUser.objects.get(email=user_email)
+                raise
+            except MyUser.DoesNotExist:
+                raise
