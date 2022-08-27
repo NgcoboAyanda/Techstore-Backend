@@ -3,20 +3,33 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APITransactionTestCase
 from user_auth.models import MyUser
 from user_auth.factories import UserFactory
+import factory
 from user_auth.serializers import UserSerializer
 
+class BaseViewTests(APITransactionTestCase):
+    """
+    The base class that all test classes will inherit.
+    Contains methods that are used across all view tests.
+    """
+    def createUsers(self, number):
+        """Create a certain number of users in the db.
+        """
+        for _ in range(number):
+            user = UserFactory()
+            user.set_password(f'user{number}password')#e.g the password for user 1 will be user1password
+            user.save()
 
-class UserSignupTests(APITransactionTestCase):
+
+class UserSignupTests(BaseViewTests):
     """
         Tests the user signup view.
     """
-    #fixtures = ["user_auth.json"] #Adds 2 users to db
 
     def setUp(self):
         """
         Add users to the db before the test is run.
         """
-        UserFactory.create_batch(3)
+        self.createUsers(3)
     
 
     def test_invalid_dob(self):
@@ -25,13 +38,12 @@ class UserSignupTests(APITransactionTestCase):
         """
         url = reverse('signup')
         #data contains the user form
-        user = UserFactory.build()
-        data = UserSerializer(user).data
-        #adding password to user object
-        data['password'] = 'normalpassword'
+        form_data = factory.build(dict, FACTORY_CLASS=UserFactory)
+        #adding normal password
+        form_data['password'] = 'normalpassword'
         #adding invalid dob
-        data['date_of_birth'] = '10-99-20'
-        response = self.client.post(url, data, format='json')
+        form_data['date_of_birth'] = '10-99-20'
+        response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         error_object = response.data['detail']
         self.assertEqual(str(error_object), 'Invalid date of birth!')
@@ -44,16 +56,16 @@ class UserSignupTests(APITransactionTestCase):
         url = reverse('signup')
         #data contains the user form data
         user = UserFactory.build()
-        data = UserSerializer(user).data
+        form_data = factory.build(dict, FACTORY_CLASS=UserFactory)
         #adding password to user object
-        data['password'] = '123'
+        form_data['password'] = '123'
         #Checking that the password we pass in for this test is really less than 6 characters.
         self.assertLess(
-            len(data['password']), 
+            len(form_data['password']), 
             6, 
-            msg = f'Error! data["password"] has {len(data["password"])} characters. In order for this test to run, the data["password"] value should be less than 6 characters.'
+            msg = f'Error! data["password"] has {len(form_data["password"])} characters. In order for this test to run, the data["password"] value should be less than 6 characters.'
         )
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         error_object = response.data['detail']
         self.assertEqual(str(error_object), 'Password has less than 6 characters. Password is too short!')
@@ -65,17 +77,16 @@ class UserSignupTests(APITransactionTestCase):
         """
         url = reverse('signup')
         #data contains the user form data
-        user = UserFactory.build()
-        data = UserSerializer(user).data
+        form_data = factory.build(dict, FACTORY_CLASS=UserFactory)
         #adding password to user object
-        data['password'] = ''
+        form_data['password'] = ''
         #Checking that the password we pass in for this test is really invalid.
         self.assertLessEqual(
-            len(data['password']), 
+            len(form_data['password']), 
             1, 
-            msg = f'Error! data["password"] has {len(data["password"])} characters. In order for this test to run, the data["password"] value should be between 0-1 characters..'
+            msg = f'Error! data["password"] has {len(form_data["password"])} characters. In order for this test to run, the data["password"] value should be between 0-1 characters..'
         )
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         error_object = response.data['detail']
         self.assertEqual(str(error_object), 'Enter a valid password.')
@@ -87,13 +98,12 @@ class UserSignupTests(APITransactionTestCase):
         """
         url = reverse('signup')
         #data contains the user form data
-        user = UserFactory.build()
-        data = UserSerializer(user).data
+        form_data = factory.build(dict, FACTORY_CLASS=UserFactory)
         #adding password to user object
-        data['password'] = 'normalpassword'
+        form_data['password'] = 'normalpassword'
         #making sure that the first_name field is empty
-        data['first_name'] = ''
-        response = self.client.post(url, data, format='json')
+        form_data['first_name'] = ''
+        response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         error_object = response.data['detail']
         self.assertEqual(str(error_object), 'Required fields have not been submitted!')
@@ -107,13 +117,12 @@ class UserSignupTests(APITransactionTestCase):
         #get the email of the user that already exists on the db
         user_that_already_exists = MyUser.objects.all().last()
         email = user_that_already_exists.email
-        #data contains the user form data
-        user = UserFactory.build()
-        data = UserSerializer(user).data
+        #form_data contains the user form data
+        form_data = factory.build(dict, FACTORY_CLASS=UserFactory)
         #adding password to user object
-        data['password'] = 'normalpassword'
-        data['email'] = email
-        response = self.client.post(url, data, format='json')
+        form_data['password'] = 'normalpassword'
+        form_data['email'] = email
+        response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
         error_object = response.data['detail']
         self.assertEqual(str(error_object), 'A user with that email address already exists.')
@@ -124,14 +133,10 @@ class UserSignupTests(APITransactionTestCase):
         Ensure the correct response (error) is sent back when user submits an invalid email.
         """
         url = reverse('signup')
-        data = {
-            "email": 'invalidemail.com',
-            "first_name": 'John',
-            "last_name": 'Doe',
-            "date_of_birth": '1958-04-02',
-            "password": 'password999#'
-        }
-        response = self.client.post(url, data, format='json')
+        form_data = factory.build(dict, FACTORY_CLASS=UserFactory)
+        #adding invalid email
+        form_data['email'] = 'invalidemail555.z0'
+        response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
         error_object = response.data['detail']
         self.assertEqual(str(error_object), 'Invalid email address!')
@@ -142,13 +147,40 @@ class UserSignupTests(APITransactionTestCase):
         Ensure that the user is created when all form data is submitted and is in the correct format.
         """
         url = reverse('signup')
-        data = {
-            "email": 'correctemail@zmail.org',
-            "first_name": 'Correct',
-            "last_name": 'Name',
-            "date_of_birth": '1990-02-09',
-            "password": 'correct-password'
-        }
-    
-        response = self.client.post(url, data, format='json')
+        form_data = factory.build(dict, FACTORY_CLASS=UserFactory)
+        #adding a password
+        form_data['password'] = 'normalpassword'
+        response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+
+class UserLoginTests(BaseViewTests):
+        """
+        Test the user login view
+        """
+        url = reverse('login')
+
+        def setUp(self):
+            """
+            Add users to the db before the test is run.
+            """
+            self.createUsers(3)
+
+        def test_login(self):
+            user = MyUser.objects.all().last()
+            form_data = {
+                'email': str(user.email),
+                'password': 'user3password'
+            }
+            #posting the data
+            response = self.client.post(self.url, form_data, format='json')
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        def test_wrong_password(self):
+            user = MyUser.objects.all().last()
+            form_data = {
+                'email': str(user.email),
+                'password': 'wrongpassword'
+            }
+            response = self.client.post(self,url, form_data, format='json')
+            self.assertEqual(response.status_code, status_code.HTTP_401_UNAUTHORIZED)

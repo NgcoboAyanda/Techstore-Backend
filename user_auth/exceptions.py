@@ -37,3 +37,10 @@ class InvalidPassword(ValidationError):
 class InvalidInformation(ValidationError):
     default_detail = 'Required fields have not been submitted!'
     default_code = 'Required Fields Not Submitted.'
+
+
+# USER EXCEPTIONS
+class UserDoesNotExist(APIException):
+    status_code = 404
+    default_detail = 'Error! There is no user associated with that email address.'
+    default_code = 'User Not Found.'
