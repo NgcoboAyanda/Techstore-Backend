@@ -45,8 +45,8 @@ class UserSignupTests(BaseViewTests):
         form_data['date_of_birth'] = '10-99-20'
         response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
-        error_object = response.data['detail']
-        self.assertEqual(str(error_object), 'Invalid date of birth!')
+        response_object = response.data['detail']
+        self.assertEqual(str(response_object), 'Invalid date of birth!')
 
 
     def test_password_too_short(self):
@@ -67,8 +67,8 @@ class UserSignupTests(BaseViewTests):
         )
         response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
-        error_object = response.data['detail']
-        self.assertEqual(str(error_object), 'Password has less than 6 characters. Password is too short!')
+        response_object = response.data['detail']
+        self.assertEqual(str(response_object), 'Password has less than 6 characters. Password is too short!')
 
 
     def test_invalid_password(self):
@@ -88,8 +88,8 @@ class UserSignupTests(BaseViewTests):
         )
         response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
-        error_object = response.data['detail']
-        self.assertEqual(str(error_object), 'Enter a valid password.')
+        response_object = response.data['detail']
+        self.assertEqual(str(response_object), 'Enter a valid password.')
 
 
     def test_invalid_information(self):
@@ -105,8 +105,8 @@ class UserSignupTests(BaseViewTests):
         form_data['first_name'] = ''
         response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
-        error_object = response.data['detail']
-        self.assertEqual(str(error_object), 'Required fields have not been submitted!')
+        response_object = response.data['detail']
+        self.assertEqual(str(response_object), 'Required fields have not been submitted!')
 
 
     def test_email_already_exists(self):
@@ -124,8 +124,8 @@ class UserSignupTests(BaseViewTests):
         form_data['email'] = email
         response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-        error_object = response.data['detail']
-        self.assertEqual(str(error_object), 'A user with that email address already exists.')
+        response_object = response.data['detail']
+        self.assertEqual(str(response_object), 'A user with that email address already exists.')
 
 
     def test_invalid_email(self):
@@ -138,8 +138,8 @@ class UserSignupTests(BaseViewTests):
         form_data['email'] = 'invalidemail555.z0'
         response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
-        error_object = response.data['detail']
-        self.assertEqual(str(error_object), 'Invalid email address!')
+        response_object = response.data['detail']
+        self.assertEqual(str(response_object), 'Invalid email address!')
 
 
     def test_create_account(self):
@@ -152,6 +152,8 @@ class UserSignupTests(BaseViewTests):
         form_data['password'] = 'normalpassword'
         response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response_object = response.data['message']
+        self.assertEqual(str(response_object), 'User successfully registered. You can now log in.')
 
 
 class UserLoginTests(BaseViewTests):
@@ -167,6 +169,9 @@ class UserLoginTests(BaseViewTests):
             self.createUsers(3)
 
         def test_login(self):
+            """
+            Ensure that the user can log in when the correct credentials are supplied.
+            """
             user = MyUser.objects.all().last()
             form_data = {
                 'email': str(user.email),
@@ -175,12 +180,20 @@ class UserLoginTests(BaseViewTests):
             #posting the data
             response = self.client.post(self.url, form_data, format='json')
             self.assertEqual(response.status_code, status.HTTP_200_OK)
+            response_object = response.data['email']
+            self.assertEqual(str(response_object), user.email)
+            
         
         def test_wrong_password(self):
+            """
+            Ensure that the correct response (401) is sent back when a user attempts to login with a password that is incorrect.
+            """
             user = MyUser.objects.all().last()
             form_data = {
                 'email': str(user.email),
                 'password': 'wrongpassword'
             }
-            response = self.client.post(self,url, form_data, format='json')
-            self.assertEqual(response.status_code, status_code.HTTP_401_UNAUTHORIZED)
+            response = self.client.post(self.url, form_data, format='json')
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            response_object = response.data['detail']
+            self.assertEqual(str(response_object), 'The password you entered is incorrect. Please try again!')

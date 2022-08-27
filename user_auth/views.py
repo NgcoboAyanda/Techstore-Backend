@@ -13,7 +13,7 @@ from user_auth.models import MyUser
 from user_auth.serializers import UserSerializer
 
 #Exceptions
-from user_auth.exceptions import EmailAlreadyExists, InvalidDateOfBirth, InvalidEmail, InvalidInformation, PasswordTooShort, InvalidPassword, UserNotFound
+from user_auth import exceptions
 
 #BASE VIEW
 class BaseView(APIView):
@@ -39,7 +39,7 @@ class BaseView(APIView):
                 return phrase
 
             else:
-                raise InvalidEmail
+                raise exceptions.InvalidEmail
         
         elif type == 'text-field':
             #We only check the length for the other fields
@@ -47,7 +47,7 @@ class BaseView(APIView):
                 return phrase
             
             else:
-                raise InvalidInformation
+                raise exceptions.InvalidInformation
                 return None
             
         elif type == 'password-field':
@@ -56,10 +56,10 @@ class BaseView(APIView):
             if chars >= 6 :
                 return phrase
             elif chars <=1:
-                raise InvalidPassword
+                raise exceptions.InvalidPassword
                 return None
             else:
-                raise PasswordTooShort
+                raise exceptions.PasswordTooShort
                 raise None
 
 
@@ -97,11 +97,11 @@ class SignupView(BaseView):
         
         except(IntegrityError):
         #An integrity error will be raised if the email address is associated with another account.
-            raise EmailAlreadyExists
+            raise exceptions.EmailAlreadyExists
 
         except(ValidationError):
         #This means the date was captured wrong
-            raise InvalidDateOfBirth
+            raise exceptions.InvalidDateOfBirth
 
     def post(self, request):
         resp = self.createUser(request_object=request)
@@ -122,13 +122,14 @@ class LoginView(BaseView):
         user_auth = authenticate(email=user_email, password=user_password)
         if user_auth is not None:
             #if authentication was successful
-            serializer = UserSerializer(user)
-            user = serializer.data
-            return Response(user)
+            serializer = UserSerializer(user_auth)
+            user_obj = serializer.data
+            return Response(user_obj)
         else:
             #if authentication failed
             try:
-                the_user = MyUser.objects.get(email=user_email)
-                raise
+                the_user = MyUser.objects.filter(email=user_email)
+                if the_user.count() == 1:
+                    raise exceptions.WrongPassword
             except MyUser.DoesNotExist:
-                raise
+                raise exceptions.UserDoesNotExist
