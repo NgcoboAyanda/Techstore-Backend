@@ -152,8 +152,6 @@ class UserSignupTests(BaseViewTests):
         form_data['password'] = 'normalpassword'
         response = self.client.post(url, form_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        response_object = response.data['message']
-        self.assertEqual(str(response_object), 'User successfully registered. You can now log in.')
 
 
 class UserLoginTests(BaseViewTests):

@@ -20,41 +20,45 @@ class BaseView(APIView):
     """
         This is the base view that every view will inherit. It contains methods that may be used across different views.
     """
-    def validate(self, type, phrase):
+    def validate(self, field_type, field_content):
         """
             Function that validates the form data.
             *Takes two arguments:
-                1) type -- ['email-field' or 'text-field' or 'password-field']
-                2) phrase -- [the string that is to be validated]
+                1) field_type -- ['email-field' or 'text-field' or 'password-field']
+                2) field_content -- [the string that is to be validated]
             *If the form data is valid then it will be returned
             *If the form data is invalid then an error will be thrown
         """
 
-        if type == 'email-field':
+        if field_type == 'email-field':
             #The email regular expression
             email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
-            if(re.fullmatch(email_regex, phrase)):
+            if(re.fullmatch(email_regex, field_content)):
                 #if the email is valid we return it
-                return phrase
+                return field_content
 
             else:
                 raise exceptions.InvalidEmail
         
-        elif type == 'text-field':
+        elif field_type == 'phone':
+            #we will validate phone number here
+            return field_content
+        
+        elif field_type == 'text-field':
             #We only check the length for the other fields
-            if(len(phrase) > 0):
-                return phrase
+            if(len(field_content) > 0):
+                return field_content
             
             else:
                 raise exceptions.InvalidInformation
                 return None
             
-        elif type == 'password-field':
+        elif field_type == 'password-field':
             #Password has to be more than 6 characters
-            chars = len(phrase)
+            chars = len(field_content)
             if chars >= 6 :
-                return phrase
+                return field_content
             elif chars <=1:
                 raise exceptions.InvalidPassword
                 return None
@@ -81,11 +85,12 @@ class SignupView(BaseView):
         """
         data = request_object.data
         #EVERY VALUE IS VALIDATED BY self.validate() function
-        email = self.validate(type='email-field', phrase=data['email'] )
-        first_name = self.validate( type='text-field', phrase=data['first_name'] )
-        last_name = self.validate( type='text-field', phrase=data['last_name'] )
-        dob = self.validate( type='text-field', phrase=data['date_of_birth'] )
-        password = self.validate( type='password-field', phrase=data['password'] )
+        email = self.validate(field_type='email-field', field_content=data['email'] )
+        first_name = self.validate( field_type='text-field', field_content=data['first_name'] )
+        last_name = self.validate( field_type='text-field', field_content=data['last_name'] )
+        dob = self.validate( field_type='text-field', field_content=data['date_of_birth'] )
+        password = self.validate( field_type='password-field', field_content=data['password'] )
+        phone = self.validate(field_type='phone-field', field_content=data['phone'])
         #Validating information
 
         try:
@@ -93,7 +98,8 @@ class SignupView(BaseView):
             new_user = MyUser(email=email, first_name=first_name, last_name=last_name, date_of_birth=dob, password='')
             new_user.set_password(password)
             new_user.save()
-            return {'message':'User successfully registered. You can now log in.'}
+            new_user_serialized = UserSerializer(new_user)
+            return new_user_serialized.data
         
         except(IntegrityError):
         #An integrity error will be raised if the email address is associated with another account.
