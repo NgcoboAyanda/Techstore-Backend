@@ -44,7 +44,7 @@ class UserSignupTests(BaseViewTests):
         #adding invalid dob
         form_data['date_of_birth'] = '10-99-20'
         response = self.client.post(url, form_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY) 
 
 
     def test_password_too_short(self):

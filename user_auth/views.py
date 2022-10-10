@@ -159,7 +159,7 @@ class LoginView(BaseView):
                 if the_user.count() == 1:
                     raise exceptions.WrongPassword
             except MyUser.DoesNotExist:
-                raise exceptions.UserDoesNotExist
+                raise exceptions.UserDoesNotExist 
 
 #Forgot Password view
 class ForgotPasswordView(BaseView):
