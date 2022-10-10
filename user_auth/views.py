@@ -76,7 +76,6 @@ class BaseView(APIView):
         """
         serialized = UserSerializer(user_object).data
         token, _ = Token.objects.get_or_create(user=user_object)
-        print(token.key)
         return serialized
 
 

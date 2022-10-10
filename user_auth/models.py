@@ -10,7 +10,7 @@ class MyUser(AbstractUser):
     last_name = models.CharField(max_length=60)
     date_of_birth = models.DateField()
     username = None 
-    phone = models.CharField( max_length=100)
+    phone = models.CharField( max_length=100, null=True)
     REQUIRED_FIELDS = ['first_name', 'last_name'] # making some fields compulsory
 
     def __str__(self):

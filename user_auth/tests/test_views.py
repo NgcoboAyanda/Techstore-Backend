@@ -5,7 +5,6 @@ from user_auth.models import MyUser
 from user_auth.factories import UserFactory
 import factory
 from user_auth.serializers import UserSerializer
-import uuid
 
 class BaseViewTests(APITransactionTestCase):
     """
