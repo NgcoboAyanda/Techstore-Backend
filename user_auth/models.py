@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractUser
 
 #USER MODEL
 class MyUser(AbstractUser):
+    uid = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     USERNAME_FIELD = 'email' #using the email as the identifier instead of username
     first_name = models.CharField(max_length=40)
