@@ -3,10 +3,15 @@ from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
+
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+
 import re
+import uuid
 
 #Models
 from user_auth.models import MyUser
@@ -65,6 +70,14 @@ class BaseView(APIView):
             else:
                 raise exceptions.PasswordTooShort
                 raise None
+    
+    def serializedUser(self, user_object):
+        """Returns serialized user object with authentication token.
+        """
+        serialized = UserSerializer(user_object).data
+        token, _ = Token.objects.get_or_create(user=user_object)
+        print(token.key)
+        return serialized
 
 
 # Signup View
@@ -128,8 +141,7 @@ class LoginView(BaseView):
         user_auth = authenticate(email=user_email, password=user_password)
         if user_auth is not None:
             #if authentication was successful
-            serializer = UserSerializer(user_auth)
-            user_obj = serializer.data
+            user_obj = self.serializedUser(user_object=user_auth)
             return Response(user_obj)
         else:
             #if authentication failed
