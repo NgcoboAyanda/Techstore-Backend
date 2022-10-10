@@ -1,24 +1,31 @@
-from django.shortcuts import render
 from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse
+import smtplib
+from django.core import mail
+from django.conf import settings
+import environ
+import socket
 
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from rest_framework import status
 
 import re
 import uuid
 
-#Models
+#Models & Serializers
 from user_auth.models import MyUser
-from user_auth.serializers import UserSerializer
+from . import serializers
 
 #Exceptions
 from user_auth import exceptions
+
+# django-environ
+env = environ.Env()
 
 #BASE VIEW
 class BaseView(APIView):
@@ -74,8 +81,9 @@ class BaseView(APIView):
     def serializedUser(self, user_object):
         """Returns serialized user object with authentication token.
         """
-        serialized = UserSerializer(user_object).data
+        serialized = serializers.UserSerializer(user_object).data
         token, _ = Token.objects.get_or_create(user=user_object)
+        serialized['auth_token'] = token.key #Adding the token to serialized data
         return serialized
 
 
@@ -85,6 +93,7 @@ class SignupView(BaseView):
         A simple View for signing up.
         *Only takes POST request*
         *Returns status code 201 HTTP CREATED on success*
+        *Returns user object if user successfully registered
     """
 
     def createUser(self, request_object):
@@ -110,8 +119,8 @@ class SignupView(BaseView):
             new_user = MyUser(email=email, first_name=first_name, last_name=last_name, date_of_birth=dob, password='')
             new_user.set_password(password)
             new_user.save()
-            new_user_serialized = UserSerializer(new_user)
-            return new_user_serialized.data
+            #Returning serialized user with a token too
+            return self.serializedUser(user_object=new_user)
         
         except(IntegrityError):
         #An integrity error will be raised if the email address is associated with another account.
@@ -123,7 +132,7 @@ class SignupView(BaseView):
 
     def post(self, request):
         resp = self.createUser(request_object=request)
-        return Response(resp, status=201)
+        return Response(resp, status=status.HTTP_201_CREATED)
 
 
 #Login View
@@ -140,8 +149,9 @@ class LoginView(BaseView):
         user_auth = authenticate(email=user_email, password=user_password)
         if user_auth is not None:
             #if authentication was successful
+            #return serialized user object with token
             user_obj = self.serializedUser(user_object=user_auth)
-            return Response(user_obj)
+            return Response(user_obj, status=status.HTTP_200_OK)
         else:
             #if authentication failed
             try:
@@ -150,3 +160,42 @@ class LoginView(BaseView):
                     raise exceptions.WrongPassword
             except MyUser.DoesNotExist:
                 raise exceptions.UserDoesNotExist
+
+#Forgot Password view
+class ForgotPasswordView(BaseView):
+    """View responsible for resetting user password.
+        *Should return status 200 if the email is registered and the reset link was sent.
+        *Should return status 404 if there is no user associated with the given email address.
+    """
+    renderer_classes = [JSONRenderer]
+
+    def sendOTP(self, recipient):
+        otp = 5555
+        try:
+            mail.send_mail(
+            subject="Techstore password reset OTP"
+            , 
+            message=f"Your OTP is {otp}"
+            ,
+            from_email=env('GMAIL_USERNAME') 
+            , 
+            recipient_list=[recipient]
+            ,
+            fail_silently=False
+        )
+        except smtplib.SMTPException:
+            raise exceptions.OTPSendError
+        except socket.gaierror:
+            raise exceptions.NetworkError
+
+    def post(self, request):
+        form_data = request.data
+        user_email = form_data['email']
+        #gettin user
+        try:
+            the_user = MyUser.objects.get(email=user_email)
+            the_user = self.serializedUser(user_object=the_user)
+            self.sendOTP(user_email)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except MyUser.DoesNotExist:
+            raise exceptions.UserDoesNotExist

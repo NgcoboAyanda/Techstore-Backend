@@ -179,3 +179,21 @@ class UserLoginTests(BaseViewTests):
             }
             response = self.client.post(self.url, form_data, format='json')
             self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+class UserForgotPassword(BaseViewTests):
+    """
+    Test the forgot password view.
+    """
+
+    def setUp(self):
+            """
+            Add users to the db before the test is run.
+            """
+            self.createUsers(3)
+    
+    def test_send_otp(self):
+        """
+        Ensure that the otp is sent when a registered user chooses to reset password.
+        """
+        pass

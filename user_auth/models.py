@@ -17,3 +17,7 @@ class MyUser(AbstractUser):
     def __str__(self):
         return self.email
     
+#OTP MODEL
+class OTP(models.Model):
+    requested_by = models.ForeignKey(to=MyUser, on_delete=models.CASCADE)
+    time_requested = models.DateTimeField(auto_now_add=True)

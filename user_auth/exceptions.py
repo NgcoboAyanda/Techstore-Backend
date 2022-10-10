@@ -25,6 +25,13 @@ class UserDoesNotExist(HTTP404):
     default_detail = 'Error! There is no user associated with the given email address.'
     default_code = 'User Not Found!'
 
+# Status code 408 (Request Time-out)
+#e.g Network error
+class HTTP408(APIException):
+    status_code = 408
+
+class NetworkError(HTTP408):
+    default_detail='Network error!'
 
 # Status code 409 (Conflict)
 #*Mostly validation errors
@@ -40,6 +47,9 @@ class EmailAlreadyExists(HTTP409):
 # Status code 422 (Unprocessable Entity)
 class HTTP422(APIException):
     status_code = 422
+
+class OTPSendError(HTTP422):
+    default_detail = 'There was an error sending the OTP to the chosen email address.'
 
 class InvalidDateOfBirth(HTTP422):
     default_detail = 'Invalid date of birth!'
