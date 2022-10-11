@@ -155,9 +155,8 @@ class LoginView(BaseView):
         else:
             #if authentication failed
             try:
-                the_user = MyUser.objects.filter(email=user_email)
-                if the_user.count() == 1:
-                    raise exceptions.WrongPassword
+                the_user = MyUser.objects.get(email=user_email)
+                raise exceptions.WrongPassword
             except MyUser.DoesNotExist:
                 raise exceptions.UserDoesNotExist 
 
