@@ -180,6 +180,18 @@ class UserLoginTests(BaseViewTests):
             response = self.client.post(self.url, form_data, format='json')
             self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+        def test_non_registered_user(self):
+            """
+            Ensure that the correct response (404) is sent back when a user tries to login with invalid credentials. That is- there was no user found that matched the given credentials. [e.g a user mis-types his/her email address when logging in]
+            """
+            form_data = {
+                'email': "emailNotAssociatedWithAnyAccount",
+                'password': "userPassword998$$"
+            }
+            response = self.client.post(self.url, form_data, format='json')
+            self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
 
 class UserForgotPassword(BaseViewTests):
     """
@@ -196,4 +208,5 @@ class UserForgotPassword(BaseViewTests):
         """
         Ensure that the otp is sent when a registered user chooses to reset password.
         """
+        #Getting a registered user
         pass
