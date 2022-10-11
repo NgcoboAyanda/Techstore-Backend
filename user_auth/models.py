@@ -12,6 +12,7 @@ class MyUser(AbstractUser):
     date_of_birth = models.DateField()
     username = None 
     phone = models.CharField( max_length=100, null=True)
+    email_verified = models.BooleanField(default=False)
     REQUIRED_FIELDS = ['first_name', 'last_name'] # making some fields compulsory
 
     def __str__(self):
