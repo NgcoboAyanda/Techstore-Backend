@@ -184,8 +184,6 @@ class ForgotPasswordView(BaseView):
         )
         except smtplib.SMTPException:
             raise exceptions.OTPSendError
-        except socket.gaierror:
-            raise exceptions.NetworkError
 
     def post(self, request):
         form_data = request.data
