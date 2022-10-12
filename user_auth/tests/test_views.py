@@ -197,6 +197,7 @@ class UserForgotPassword(BaseViewTests):
     """
     Test the forgot password view.
     """
+    url = reverse('forgot-password')
 
     def setUp(self):
             """
@@ -206,7 +207,22 @@ class UserForgotPassword(BaseViewTests):
     
     def test_send_otp(self):
         """
-        Ensure that the otp is sent when a registered user chooses to reset password.
+        Ensure that the password reset link is sent when a registered user chooses to reset password.
         """
-        #Getting a registered user
-        pass
+        #Getting any registered user
+        user = MyUser.objects.all().first()
+        form_data = {
+            'email': user.email
+        }
+        response = self.client.post(self.url, form_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_non_registered_user(self):
+        """
+        Ensure that the correct response (404) is sent back when a non-registered user tries to reset password.
+        """
+        form_data = {
+            'email': "someEmailThatIsNotAssociatedWithAnyUser@gmail.com"
+        }
+        response = self.client.post(self.url, form_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

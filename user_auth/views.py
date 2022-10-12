@@ -169,7 +169,7 @@ class ForgotPasswordView(BaseView):
     """
     renderer_classes = [JSONRenderer]
 
-    def sendOTP(self, user):
+    def sendPasswordResetOTP(self, user):
         newOTP = OTP.objects.create(requested_by=user, requested_on=datetime.datetime.now(),otp_request_id=uuid.uuid4())
         try:
             mail.send_mail(
@@ -192,7 +192,7 @@ class ForgotPasswordView(BaseView):
         #gettin user
         try:
             the_user = MyUser.objects.get(email=user_email)
-            self.sendOTP(the_user)
+            self.sendPasswordResetOTP(the_user)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except MyUser.DoesNotExist:
             raise exceptions.UserDoesNotExist
