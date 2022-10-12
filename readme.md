@@ -5,3 +5,6 @@ An e-commerce REST API built with Django and Django Rest Framework.
 * __Python 3.9.6__
     * Django 4.1
     * Django REST framework
+
+## Documentation
+The API has been documented using Swaggerhub. You can find it [here](https://app.swaggerhub.com/apis-docs/NgcoboAyanda/TechstoreAPI/0.1a#/Reset%20User%20Password/ResetPassword)

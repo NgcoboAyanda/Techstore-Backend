@@ -1,12 +1,16 @@
+import smtplib
+import random
+import datetime
+import environ
+import socket
+import re
+import uuid
 from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
-import smtplib
 from django.core import mail
 from django.conf import settings
-import environ
-import socket
-
+from django.urls import reverse
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
@@ -14,11 +18,8 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 
-import re
-import uuid
-
 #Models & Serializers
-from user_auth.models import MyUser
+from user_auth.models import MyUser,OTP
 from . import serializers
 
 #Exceptions
@@ -168,17 +169,17 @@ class ForgotPasswordView(BaseView):
     """
     renderer_classes = [JSONRenderer]
 
-    def sendOTP(self, recipient):
-        otp = 5555
+    def sendOTP(self, user):
+        newOTP = OTP.objects.create(requested_by=user, requested_on=datetime.datetime.now(),otp_request_id=uuid.uuid4())
         try:
             mail.send_mail(
-            subject="Techstore password reset OTP"
+            subject="Techstore password reset link"
             , 
-            message=f"Your OTP is {otp}"
+            message=f"Your Techstore account password reset link is http://www.techstore.co.za/reset-password/?otp_request_id={newOTP.otp_request_id} \n This link is only valid for 30 minutes. If you did not request to reset your password then please ignore this email."
             ,
             from_email=env('GMAIL_USERNAME') 
             , 
-            recipient_list=[recipient]
+            recipient_list=[user.email]
             ,
             fail_silently=False
         )
@@ -191,8 +192,7 @@ class ForgotPasswordView(BaseView):
         #gettin user
         try:
             the_user = MyUser.objects.get(email=user_email)
-            the_user = self.serializedUser(user_object=the_user)
-            self.sendOTP(user_email)
+            self.sendOTP(the_user)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except MyUser.DoesNotExist:
             raise exceptions.UserDoesNotExist

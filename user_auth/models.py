@@ -20,5 +20,9 @@ class MyUser(AbstractUser):
     
 #OTP MODEL
 class OTP(models.Model):
-    requested_by = models.ForeignKey(to=MyUser, on_delete=models.CASCADE)
-    time_requested = models.DateTimeField(auto_now_add=True)
+    otp_request_id = models.UUIDField(default=uuid.uuid4, unique=True)
+
+
+    def __str__(self):
+        return self.requested_by
+    
