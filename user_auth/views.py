@@ -20,7 +20,7 @@ from rest_framework import status
 from rest_framework import viewsets
 
 #Models & Serializers
-from user_auth.models import MyUser,OTP
+from user_auth.models import MyUser
 from . import serializers
 
 #Exceptions
