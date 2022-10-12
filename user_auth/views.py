@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework import status
+from rest_framework import viewsets
 
 #Models & Serializers
 from user_auth.models import MyUser,OTP
@@ -161,21 +162,20 @@ class LoginView(BaseView):
             except MyUser.DoesNotExist:
                 raise exceptions.UserDoesNotExist 
 
-#Forgot Password view
-class ForgotPasswordView(BaseView):
-    """View responsible for resetting user password.
-        *Should return status 200 if the email is registered and the reset link was sent.
+#RequestPasswordReset
+class RequestPasswordResetView(BaseView):
+    """View responsible for requesting password reset OTP.
+        *Should return status 200 if the email is registered and the OTP was sent to the user's email.
         *Should return status 404 if there is no user associated with the given email address.
     """
-    renderer_classes = [JSONRenderer]
 
     def sendPasswordResetOTP(self, user):
-        newOTP = OTP.objects.create(requested_by=user, requested_on=datetime.datetime.now(),otp_request_id=uuid.uuid4())
+        otp_code = random.randint(100000, 999999)
         try:
             mail.send_mail(
             subject="Techstore password reset link"
             , 
-            message=f"Your Techstore account password reset link is http://www.techstore.co.za/reset-password/?otp_request_id={newOTP.otp_request_id} \n This link is only valid for 30 minutes. If you did not request to reset your password then please ignore this email."
+            message=f"Your Techstore account password reset OTP is {otp_code}. \n Please ignore this message if you did not request to change your password."
             ,
             from_email=env('GMAIL_USERNAME') 
             , 
@@ -187,6 +187,7 @@ class ForgotPasswordView(BaseView):
             raise exceptions.OTPSendError
 
     def post(self, request):
+        #User submits his email address
         form_data = request.data
         user_email = form_data['email']
         #gettin user

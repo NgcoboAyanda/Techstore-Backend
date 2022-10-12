@@ -193,9 +193,9 @@ class UserLoginTests(BaseViewTests):
 
 
 
-class UserForgotPassword(BaseViewTests):
+class RequestPasswordReset(BaseViewTests):
     """
-    Test the forgot password view.
+    Test RequestPasswordReset view.
     """
     url = reverse('forgot-password')
 
@@ -207,7 +207,7 @@ class UserForgotPassword(BaseViewTests):
     
     def test_send_otp(self):
         """
-        Ensure that the password reset link is sent when a registered user chooses to reset password.
+        Ensure that the otp is sent when a registered user chooses to reset password.
         """
         #Getting any registered user
         user = MyUser.objects.all().first()

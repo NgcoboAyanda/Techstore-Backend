@@ -1,5 +1,5 @@
 from django.db import models
-import uuid
+import random
 from django.contrib.auth.models import AbstractUser
 
 #USER MODEL
@@ -17,14 +17,4 @@ class MyUser(AbstractUser):
 
     def __str__(self):
         return self.email
-    
-#OTP MODEL
-class OTP(models.Model):
-    otp_request_id = models.UUIDField(default=uuid.uuid4, unique=True)
-    requested_by = models.ForeignKey(to=MyUser, on_delete=models.CASCADE)
-    requested_on = models.DateTimeField(auto_now_add=True)
-
-
-    def __str__(self):
-        return self.requested_by
     
