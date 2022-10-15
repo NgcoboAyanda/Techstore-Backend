@@ -36,6 +36,7 @@ SECRET_KEY = env('SECRET_KEY')
 # False if not in os.environ because of casting above
 DEBUG = env('DEBUG')
 
+APPEND_SLASH=False
 ALLOWED_HOSTS = []
 
 #USER MODELS
@@ -76,9 +77,10 @@ CORS_ALLOW_HEADERS = [
 # Application definition
 INSTALLED_APPS = [
     "corsheaders",#django-cors-headers
-    'user_auth',#User Authentication App
+    'user_auth',#user authentication App
     'django.contrib.admin',
     'django.contrib.auth',
+    'django_rest_passwordreset',# django_rest_passwordreset
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -102,7 +104,7 @@ ROOT_URLCONF = 'base.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [ os.path.join( BASE_DIR , 'templates' ) ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
