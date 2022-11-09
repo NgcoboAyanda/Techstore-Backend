@@ -9,7 +9,6 @@ class MyUser(AbstractUser):
     USERNAME_FIELD = 'email' #using the email as the identifier instead of username
     first_name = models.CharField(max_length=40)
     last_name = models.CharField(max_length=60)
-    date_of_birth = models.DateField()
     username = None 
     phone = models.CharField( max_length=100, null=True)
     email_verified = models.BooleanField(default=False)

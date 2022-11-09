@@ -31,22 +31,6 @@ class UserSignupTests(BaseViewTests):
         """
         self.createUsers(3)
     
-
-    def test_invalid_dob(self):
-        """
-        Ensure the correct error if returned when an invalid date of birth is submitted.
-        """
-        url = reverse('signup')
-        #data contains the user form
-        form_data = factory.build(dict, FACTORY_CLASS=UserFactory)
-        #adding normal password
-        form_data['password'] = 'normalpassword'
-        #adding invalid dob
-        form_data['date_of_birth'] = '10-99-20'
-        response = self.client.post(url, form_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_422_UNPROCESSABLE_ENTITY) 
-
-
     def test_password_too_short(self):
         """
         Ensure that the correct response (error) is sent back when a user attempts to use a password that is too short. (i.e less than 6 characters)
@@ -190,39 +174,3 @@ class UserLoginTests(BaseViewTests):
             }
             response = self.client.post(self.url, form_data, format='json')
             self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-
-
-class RequestPasswordReset(BaseViewTests):
-    """
-    Test RequestPasswordReset view.
-    """
-    url = reverse('forgot-password')
-
-    def setUp(self):
-            """
-            Add users to the db before the test is run.
-            """
-            self.createUsers(3)
-    
-    def test_send_otp(self):
-        """
-        Ensure that the otp is sent when a registered user chooses to reset password.
-        """
-        #Getting any registered user
-        user = MyUser.objects.all().first()
-        form_data = {
-            'email': user.email
-        }
-        response = self.client.post(self.url, form_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-    def test_non_registered_user(self):
-        """
-        Ensure that the correct response (404) is sent back when a non-registered user tries to reset password.
-        """
-        form_data = {
-            'email': "someEmailThatIsNotAssociatedWithAnyUser@gmail.com"
-        }
-        response = self.client.post(self.url, form_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -1,23 +1,16 @@
-import smtplib
-import random
 import datetime
-import environ
-import socket
 import re
-import uuid
+import environ
 from django.contrib.auth import authenticate
 from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
-from django.core import mail
-from django.conf import settings
-from django.urls import reverse
 from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
 
 #Models & Serializers
 from user_auth.models import MyUser
@@ -111,18 +104,18 @@ class SignupView(BaseView):
         email = self.validate(field_type='email-field', field_content=data['email'] )
         first_name = self.validate( field_type='text-field', field_content=data['first_name'] )
         last_name = self.validate( field_type='text-field', field_content=data['last_name'] )
-        dob = self.validate( field_type='text-field', field_content=data['date_of_birth'] )
         password = self.validate( field_type='password-field', field_content=data['password'] )
         phone = self.validate(field_type='phone-field', field_content=data['phone'])
         #Validating information
 
         try:
             #creating the new user
-            new_user = MyUser(email=email, first_name=first_name, last_name=last_name, date_of_birth=dob, password='')
+            new_user = MyUser(email=email, first_name=first_name, last_name=last_name, password='')
             new_user.set_password(password)
             new_user.save()
+            token = Token.objects.create(user=new_user)
             #Returning serialized user with a token too
-            return self.serializedUser(user_object=new_user)
+            return None
         
         except(IntegrityError):
         #An integrity error will be raised if the email address is associated with another account.
@@ -151,49 +144,32 @@ class LoginView(BaseView):
         user_auth = authenticate(email=user_email, password=user_password)
         if user_auth is not None:
             #if authentication was successful
-            #return serialized user object with token
-            user_obj = self.serializedUser(user_object=user_auth)
-            return Response(user_obj, status=status.HTTP_200_OK)
+            #return the user token
+            token = self.serializedUser(user_auth)['auth_token']
+            user_serialized = serializers.UserSerializer(user_auth).data
+            return Response({
+                'user': user_serialized,
+                'token': token
+            }, status=status.HTTP_200_OK)
         else:
             #if authentication failed
             try:
                 the_user = MyUser.objects.get(email=user_email)
                 raise exceptions.WrongPassword
             except MyUser.DoesNotExist:
-                raise exceptions.UserDoesNotExist 
+                raise exceptions.UserDoesNotExist
 
-#RequestPasswordReset
-class RequestPasswordResetView(BaseView):
-    """View responsible for requesting password reset OTP.
-        *Should return status 200 if the email is registered and the OTP was sent to the user's email.
-        *Should return status 404 if there is no user associated with the given email address.
+class GetUserView(BaseView):
+    """
+    A simple view for getting user information.
+    *Takes the user token as a parameter
     """
 
-    def sendPasswordResetOTP(self, user):
-        otp_code = random.randint(100000, 999999)
+    def get(self, request, user_token):
         try:
-            mail.send_mail(
-            subject="Techstore password reset link"
-            , 
-            message=f"Your Techstore account password reset OTP is {otp_code}. \n Please ignore this message if you did not request to change your password."
-            ,
-            from_email=env('GMAIL_USERNAME') 
-            , 
-            recipient_list=[user.email]
-            ,
-            fail_silently=False
-        )
-        except smtplib.SMTPException:
-            raise exceptions.OTPSendError
-
-    def post(self, request):
-        #User submits his email address
-        form_data = request.data
-        user_email = form_data['email']
-        #gettin user
-        try:
-            the_user = MyUser.objects.get(email=user_email)
-            self.sendPasswordResetOTP(the_user)
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except MyUser.DoesNotExist:
+            user = Token.objects.get(key=user_token).user
+            user = serializers.UserSerializer(user).data
+            return Response(user, status=status.HTTP_200_OK)
+        except Token.DoesNotExist:
             raise exceptions.UserDoesNotExist
+        pass
