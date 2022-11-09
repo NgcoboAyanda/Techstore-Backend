@@ -78,6 +78,7 @@ CORS_ALLOW_HEADERS = [
 INSTALLED_APPS = [
     "corsheaders",#django-cors-headers
     'user_auth',#user authentication App
+    'computers',
     'django.contrib.admin',
     'django.contrib.auth',
     'django_rest_passwordreset',# django_rest_passwordreset
