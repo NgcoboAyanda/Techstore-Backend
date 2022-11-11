@@ -72,20 +72,42 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
+#REST FRAMEWORK
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (  
+        'rest_framework.authentication.TokenAuthentication',        
+    ),
 
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),       
+}
 
 # Application definition
 INSTALLED_APPS = [
+    #CORS
     "corsheaders",#django-cors-headers
+    
+    #MY APPS
     'user_auth',#user authentication App
-    'computers',
+    'computers',#computers app
+    
+    #DJANGO
     'django.contrib.admin',
     'django.contrib.auth',
-    'django_rest_passwordreset',# django_rest_passwordreset
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    #THIRD PARTY APPS
+    'rest_framework',
+    'django_rest_passwordreset',# django_rest_passwordreset
     'rest_framework.authtoken'#DRF Token Authentication
 ]
 

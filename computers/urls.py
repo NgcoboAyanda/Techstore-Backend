@@ -5,4 +5,4 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'desktops', DesktopsViewset, basename="desktops")
 router.register(r'laptops', LaptopsViewset, basename="laptops")
-
+urlpatterns = router.urls

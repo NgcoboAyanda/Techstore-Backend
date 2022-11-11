@@ -91,7 +91,7 @@ class SignupView(BaseView):
         *Returns user object if user successfully registered
     """
 
-    def createUser(self, request_object):
+    def createUser(self, data):
         """
             A function that signs the user up.
             *Takes one argument:
@@ -99,7 +99,6 @@ class SignupView(BaseView):
             *If there are no errors then the user is created and a response with HTTP_STATUS_CODE-201-CREATED is returned.
             *If there are errors then they are handled.
         """
-        data = request_object.data
         #EVERY VALUE IS VALIDATED BY self.validate() function
         email = self.validate(field_type='email-field', field_content=data['email'] )
         first_name = self.validate( field_type='text-field', field_content=data['first_name'] )
@@ -113,7 +112,6 @@ class SignupView(BaseView):
             new_user = MyUser(email=email, first_name=first_name, last_name=last_name, password='')
             new_user.set_password(password)
             new_user.save()
-            token = Token.objects.create(user=new_user)
             #Returning serialized user with a token too
             return None
         
@@ -126,7 +124,7 @@ class SignupView(BaseView):
             raise exceptions.InvalidDateOfBirth
 
     def post(self, request):
-        resp = self.createUser(request_object=request)
+        resp = self.createUser(data=request.data)
         return Response(resp, status=status.HTTP_201_CREATED)
 
 
