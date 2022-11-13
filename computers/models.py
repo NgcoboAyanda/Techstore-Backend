@@ -25,7 +25,7 @@ class Computer(Product):
 class Desktop(Computer):
     COMPUTER_CASE_SIZE_CHOICES = (
         ('Small', "SFF"),
-        ('Mini', "Mini Tower")
+        ('Mini', "Mini Tower"),
         ('Mid', "Mid Tower"),
         ('Big', "Full Tower")
     )
