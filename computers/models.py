@@ -1,9 +1,10 @@
 from django.db import models
+from shop.models import Product
 
 # Create your models here.
-class Computer(models.Model):
+class Computer(Product):
     brand_name = models.CharField(max_length=100)
-    model_name = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
     processor = models.CharField(max_length=100)
     storage = models.IntegerField()#in MB
     memory = models.IntegerField()#in MB

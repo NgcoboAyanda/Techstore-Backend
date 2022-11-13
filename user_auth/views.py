@@ -27,6 +27,11 @@ class BaseView(APIView):
     """
         This is the base view that every view will inherit. It contains methods that may be used across different views.
     """
+
+    #User auth shouldn't need authentication
+    authentication_clases = [ ]
+    permission_classes = [ ]
+
     def validate(self, field_type, field_content):
         """
             Function that validates the form data.

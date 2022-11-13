@@ -74,6 +74,9 @@ CORS_ALLOW_HEADERS = [
 
 #REST FRAMEWORK
 REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': "rest_framework.pagination.PageNumberPagination",
+    'PAGE_SIZE': 20,
+
     'DEFAULT_AUTHENTICATION_CLASSES': (  
         'rest_framework.authentication.TokenAuthentication',        
     ),
@@ -95,6 +98,7 @@ INSTALLED_APPS = [
     
     #MY APPS
     'user_auth',#user authentication App
+    'shop',#shop app, contains product model
     'computers',#computers app
     
     #DJANGO
