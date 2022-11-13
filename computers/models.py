@@ -15,5 +15,5 @@ class Desktop(Computer):
 
 class Laptop(Computer):
     screen_resolution = models.CharField(max_length=100)
-    battery_capacity = models.CharField(max_length=100)
+    battery_capacity = models.CharField(max_length=100)#in mAH
     battery_life = models.IntegerField()#in hours
