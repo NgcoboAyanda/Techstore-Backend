@@ -8,6 +8,4 @@ class Laptop(Product):
     battery = models.CharField(max_length=100)
     camera = models.CharField(max_length=50)
     os = models.CharField(max_length=50)
-    connectivity = models.CharField(max_length=50)
-    video_output = models.CharField(max_length=50)
-    audio_output = models.CharField(max_length=50)
+    memory = models.CharField(max_length=50)

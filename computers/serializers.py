@@ -18,10 +18,8 @@ class LaptopSerializer(serializers.ModelSerializer):
     battery = serializers.CharField(max_length=100)
     camera = serializers.CharField(max_length=50)
     os = serializers.CharField(max_length=50)
-    connectivity = serializers.CharField(max_length=50)
-    video_output = serializers.CharField(max_length=50)
-    audio_output = serializers.CharField(max_length=50) 
+    memory = serializers.CharField(max_length=50)
 
     class Meta:
         model = Laptop
-        fields = ['name', 'description', 'price', 'stock', 'battery', 'camera', 'os', 'connectivity', 'video_output', 'audio_output']
+        fields = ['name', 'description', 'price', 'stock', 'battery', 'camera', 'os', 'memory']
