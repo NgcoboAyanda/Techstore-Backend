@@ -1,34 +1,29 @@
 from rest_framework import viewsets
+from rest_framework import status
 from rest_framework import mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+import json
 
 from computers.models import Laptop, Desktop
 from computers.serializers import LaptopSerializer, DesktopSerializer
 
-class ComputersViewSet(mixins.ListModelMixin,viewsets.GenericViewSet):
-    """
-    The base viewset for all computer categories
-    """
-    
-    authentication_clases = [ TokenAuthentication ]
-    permission_classes = [ IsAuthenticated ]
-
 # Create your views here.
-class DesktopsViewset(ComputersViewSet):
+class DesktopsViewset(viewsets.GenericViewSet):
     """
     A simple view for listing or retrieving desktop computers.
     """
 
-    category_name = "desktops"
+    authentication_clases = [ TokenAuthentication ]
+    permission_classes = [ IsAuthenticated ]
 
     def list(self, request):
         queryset = Desktop.objects.all()
         serializer = DesktopSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    def create(self, data):
+    def create(self, request):
         pass
 
 
@@ -41,15 +36,20 @@ class DesktopsViewset(ComputersViewSet):
 
 
 
-class LaptopsViewset(ComputersViewSet):
+class LaptopsViewset(viewsets.GenericViewSet):
     """
     A simple view for listing or retrieving laptop computers.
     """
 
-    category_name = "laptops"
+    authentication_clases = [ TokenAuthentication ]
+    permission_classes = [ IsAuthenticated ]
 
     def list(self, request):
         pass
 
-    def create(self, data):
-        pass
+    def create(self, request, *args, **kwargs):
+        serializer = LaptopSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(None, status=status.HTTP_201_CREATED)
+        

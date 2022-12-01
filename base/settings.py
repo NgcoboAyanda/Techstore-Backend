@@ -37,7 +37,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 APPEND_SLASH=False
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 #USER MODELS
 AUTH_USER_MODEL = 'user_auth.MyUser'
@@ -60,6 +60,7 @@ CORS_ALLOW_METHODS = [
     "OPTIONS",
     "POST",
 ]
+
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
