@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from computers.models import Desktop, Laptop
 
+#Desktop Serializer
 class DesktopSerializer(serializers.ModelSerializer):
     size = serializers.CharField(max_length=100)
 
@@ -8,6 +9,7 @@ class DesktopSerializer(serializers.ModelSerializer):
         model = Desktop
         fields = ['name', 'description', 'price', 'stock', 'size']
 
+#Laptop Serializer
 class LaptopSerializer(serializers.ModelSerializer):
     name = serializers.CharField(max_length=100)
     description = serializers.CharField(max_length=1000)
