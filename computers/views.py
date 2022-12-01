@@ -15,19 +15,6 @@ class ComputersViewSet(mixins.ListModelMixin,viewsets.GenericViewSet):
     authentication_clases = [ TokenAuthentication ]
     permission_classes = [ IsAuthenticated ]
 
-    paginate_by = 20
-
-    def createResponse(self, category_name, no_of_products, items, current_page_no, last_page_no):
-        return {
-            'category_name': category_name,
-            'products': {
-                'total_number_of_products': no_of_products,
-                'items': items
-            },
-            'current_page_number': current_page_no,
-            'last_page_number': last_page_no
-        }
-
 # Create your views here.
 class DesktopsViewset(ComputersViewSet):
     """
@@ -42,7 +29,7 @@ class DesktopsViewset(ComputersViewSet):
         return Response(serializer.data)
 
     def create(self, data):
-        print(data)
+        pass
 
 
     def retrieve(self, request, pk=None):
@@ -62,4 +49,7 @@ class LaptopsViewset(ComputersViewSet):
     category_name = "laptops"
 
     def list(self, request):
+        pass
+
+    def create(self, data):
         pass
