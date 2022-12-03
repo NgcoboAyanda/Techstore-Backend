@@ -101,6 +101,10 @@ INSTALLED_APPS = [
     'user_auth',#user authentication App
     'shop',#shop app, contains product model
     'computers',#computers app
+    'consoles', #consoles app
+    'phones', #phones app
+    'tablets', #tablets app
+    'accessories', #accessories app
     
     #DJANGO
     'django.contrib.admin',
