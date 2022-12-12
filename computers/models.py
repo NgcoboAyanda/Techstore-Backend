@@ -7,6 +7,7 @@ class Desktop(Product):
     ram = models.CharField(max_length=10)
     storage = models.CharField(max_length=10)
 
+
 class Laptop(Product):
     battery = models.CharField(max_length=100)
     camera = models.CharField(max_length=50)

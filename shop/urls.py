@@ -1,6 +1,9 @@
-from rest_framework.routers import DefaultRouter
-from shop.views import GetAllProductsViewSet
+from django.urls import path
+from rest_framework.generics import ListAPIView
 
-router = DefaultRouter()
-router.register(r'all', GetAllProductsViewSet, basename='all-products' )
-urlpatterns = router.urls
+from .models import Product
+from .serializers import ProductSerializer
+
+urlpatterns = [
+    path('all/', ListAPIView.as_view(queryset=Product.objects.all(), serializer_class=ProductSerializer))
+]

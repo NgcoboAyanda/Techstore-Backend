@@ -6,3 +6,6 @@ class Product(models.Model):
     description = models.CharField(max_length=1000)
     price = models.CharField(max_length=100)
     stock = models.IntegerField(default=20)
+
+    class Meta:
+        ordering = ('name',)
