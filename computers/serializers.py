@@ -7,7 +7,7 @@ class DesktopSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Desktop
-        fields = ['name', 'description', 'price', 'stock', 'size']
+        fields = ['name', 'description', 'price', 'size', 'os', 'ram', 'storage']
 
 #Laptop Serializer
 class LaptopSerializer(serializers.ModelSerializer):
@@ -22,4 +22,4 @@ class LaptopSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Laptop
-        fields = ['name', 'description', 'price', 'stock', 'battery', 'camera', 'os', 'memory']
+        fields = ['name', 'description', 'price', 'battery', 'camera', 'os', 'ram', 'storage']
