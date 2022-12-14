@@ -1,9 +1,9 @@
 from django.urls import path
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 from .models import Product
 from .serializers import ProductSerializer
 
-urlpatterns = [
-    path('all/', ListAPIView.as_view(queryset=Product.objects.all(), serializer_class=ProductSerializer))
-]
+#urlpatterns = [
+#    path('all/', ListAPIView.as_view(queryset=Product.objects.all(), serializer_class=ProductSerializer)),
+#]
