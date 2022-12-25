@@ -5,4 +5,4 @@ from .models import Console
 class ConsoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Console
-        fields = ['__all__']
+        fields = '__all__'
