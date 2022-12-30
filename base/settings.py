@@ -37,9 +37,10 @@ SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # False if not in os.environ because of casting above
-DEBUG = True
+DEBUG = False
 
 APPEND_SLASH=False
+
 ALLOWED_HOSTS = ["*"]
 
 #USER MODELS
@@ -87,7 +88,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+        #'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 
     'DEFAULT_PERMISSION_CLASSES': (
