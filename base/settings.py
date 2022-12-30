@@ -24,6 +24,8 @@ env = environ.Env(
 # The base directory for our project
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') ##specify static root
+
 # Take environment variable from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
