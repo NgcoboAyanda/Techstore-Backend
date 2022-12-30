@@ -4,4 +4,4 @@ from .models import Accessory
 class AccessorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Accessory
-        fields = ['__all__']
+        fields = '__all__'

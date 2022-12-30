@@ -4,4 +4,4 @@ from tablets.models import Tablet
 class TabletSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tablet
-        fields = ['__all__']
+        fields = '__all__'
