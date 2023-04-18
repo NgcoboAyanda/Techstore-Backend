@@ -37,7 +37,8 @@ SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # False if not in os.environ because of casting above
-DEBUG = env('DEBUG') 
+#DEBUG = env('DEBUG') 
+DEBUG = True
 
 APPEND_SLASH=False
 
